@@ -15,6 +15,6 @@ class MainController
             echo 'table exists';
         }
 
-        
+
     }
 }
