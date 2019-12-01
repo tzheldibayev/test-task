@@ -7,5 +7,8 @@ return [
         'password' => '',
         'options' => [
         ],
+    ],
+    'app' => [
+        'url' => 'localhost'
     ]
 ];

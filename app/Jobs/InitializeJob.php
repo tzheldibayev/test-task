@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Helpers\Slugger;
 use Core\Application;
 
 class InitializeJob implements Job
@@ -10,14 +11,14 @@ class InitializeJob implements Job
      * @var $pdo \PDO
      */
     private $pdo;
-    private $tableExists = false;
+    private $result = [];
 
     public function handle()
     {
         $this->pdo = Application::getDb()->getPdo();
 
         if ($this->tableExists()) {
-            $this->tableExists = true;
+            $this->result['tableExists'] = true;
         } else {
             $this->pdo->query('CREATE TABLE `promo` (
                 `id` INT AUTO_INCREMENT NOT NULL,
@@ -32,7 +33,8 @@ class InitializeJob implements Job
 
         $this->exportData();
 
-        return ['tableExists' => $this->tableExists];
+        $this->result['tableExists'] = false;
+        return $this->result;
 
     }
 
@@ -41,10 +43,10 @@ class InitializeJob implements Job
         try {
             $result = $this->pdo->query('SELECT 1 FROM promo LIMIT 1');
         } catch (\Exception $e) {
-            return FALSE;
+            return false;
         }
 
-        return $result !== FALSE;
+        return $result !== false;
     }
 
     public function exportData()
@@ -75,7 +77,11 @@ class InitializeJob implements Job
             $sql->bindParam(':end_date', $dataToIns['end_date']);
             $sql->bindParam(':status', $dataToIns['status']);
             $sql->execute();
+
+            $this->result['promo'][] = $dataToIns;
         }
+
+
 
     }
 
