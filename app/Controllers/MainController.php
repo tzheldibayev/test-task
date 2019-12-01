@@ -13,13 +13,16 @@ class MainController
         $result = $job->handle();
 
         if ($result['tableExists'] === true) {
-            echo 'table exists' . PHP_EOL;
+            echo 'Table exists' . '<br>';
         }
+
+        echo '<pre>';
+        print_r($result['randomRow']);
 
         foreach ($result['promo'] as $promo) {
+            echo '<br>';
             echo Slugger::generate($promo['id'],$promo['name']);
         }
-
 
     }
 }

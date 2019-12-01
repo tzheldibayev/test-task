@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Helpers\Slugger;
+use App\Adapters\CsvToArray;
 use Core\Application;
 
 class InitializeJob implements Job
@@ -29,11 +29,14 @@ class InitializeJob implements Job
                 PRIMARY KEY (`id`)) 
                 CHARACTER SET utf8 COLLATE utf8_general_ci'
             );
+
+            $this->result['tableExists'] = false;
         }
 
         $this->exportData();
+        $selectedId = $this->changeStatusForRandomRow();
+        $this->result['randomRow'] = $this->getSingleRow($selectedId);
 
-        $this->result['tableExists'] = false;
         return $this->result;
 
     }
@@ -49,7 +52,7 @@ class InitializeJob implements Job
         return $result !== false;
     }
 
-    public function exportData()
+    private function exportData()
     {
         $this->pdo->query('TRUNCATE TABLE promo');
 
@@ -58,7 +61,7 @@ class InitializeJob implements Job
             die('File not found.');
         }
 
-        foreach ($this->csvToArray($csvfile) as $data) {
+        foreach (CsvToArray::handle($csvfile) as $data) {
             $dataToIns = [
                 'id' => (int) $data['ID акции'],
                 'name' => $data['Название акции'],
@@ -80,29 +83,30 @@ class InitializeJob implements Job
 
             $this->result['promo'][] = $dataToIns;
         }
-
-
-
     }
 
-    public function csvToArray($filename = '', $delimiter = ';')
+    public function changeStatusForRandomRow()
     {
-        if (!file_exists($filename) || !is_readable($filename)) {
-            return false;
-        }
+        $stmt = $this->pdo->query('SELECT * FROM `promo`;');
+        $ids = $stmt->fetchAll(\PDO::FETCH_COLUMN, 'id');
 
-        $header = NULL;
-        $result = array();
-        if (($handle = fopen($filename, 'r')) !== FALSE) {
-            while (($row = fgetcsv($handle, 1000, $delimiter)) !== FALSE) {
-                if (!$header)
-                    $header = $row;
-                else
-                    $result[] = array_combine($header, $row);
-            }
-            fclose($handle);
-        }
+        $index =  array_rand($ids, 1);
+        $id = $ids[$index];
 
-        return $result;
+        $this->pdo->query("UPDATE `promo` SET `status` = CASE
+            WHEN status=1 THEN 0
+            WHEN status=0 THEN 1
+            END
+            where id={$id}");
+
+        return $id;
+    }
+
+    private function getSingleRow($id)
+    {
+        $stmt = $this->pdo->query("SELECT * FROM `promo` WHERE id=$id;");
+        $data = $stmt->fetch();
+        $data['status'] = $data['status'] === 1 ? 1 : 0;
+        return $data;
     }
 }
