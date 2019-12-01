@@ -11,9 +11,10 @@ class MainController
         $job = new InitializeJob();
         $result = $job->handle();
 
-        if ($result['tableExists']) {
+        if ($result['tableExists'] === true) {
             echo 'table exists';
         }
-        echo 'table not exists';
+
+        
     }
 }

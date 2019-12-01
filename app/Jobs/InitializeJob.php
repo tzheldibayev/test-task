@@ -10,11 +10,11 @@ class InitializeJob implements Job
 
     public function handle()
     {
-        /**
-         * @var $app Application
-         */
         $pdo = Application::getDb()->getPdo();
-        try {
+
+        if ($this->tableExists()) {
+            $this->tableExists = true;
+        } else {
             $pdo->query('CREATE TABLE `promo` (
                 `id` INT AUTO_INCREMENT NOT NULL,
                 `name` varchar(255) NOT NULL,
@@ -24,12 +24,21 @@ class InitializeJob implements Job
                 PRIMARY KEY (`id`)) 
                 CHARACTER SET utf8 COLLATE utf8_general_ci'
             );
-        } catch (\PDOException $ex) {
-            $this->tableExists = true;
         }
-
 
         return ['tableExists' => $this->tableExists];
 
+    }
+
+    public function tableExists()
+    {
+        try {
+            $result = Application::getDb()->getPdo()->query("SELECT 1 FROM promo LIMIT 1");
+        } catch (\Exception $e) {
+            // We got an exception == table not found
+            return FALSE;
+        }
+
+        return $result !== FALSE;
     }
 }
