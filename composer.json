@@ -1,0 +1,11 @@
+{
+    "name": "talgat065/test-task",
+    "type": "project",
+    "authors": [
+        {
+            "name": "talgat065",
+            "email": "talgat06585@gmail.com"
+        }
+    ],
+    "require": {}
+}
