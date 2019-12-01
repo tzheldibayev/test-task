@@ -1,11 +1,11 @@
 <?php
 
-namespace Core;
+namespace Core\Router;
 
 /**
  * Class Router.
  */
-class Router
+class Router implements RouterInterface
 {
     private $routes = [];
     private $baseRoute = '';

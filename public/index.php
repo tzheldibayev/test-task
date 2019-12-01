@@ -2,17 +2,17 @@
 define('display_errors', 1);
 require __DIR__.'/../vendor/autoload.php';
 
+$config = __DIR__.'/../config/app.php';
+
 //Create a new router instance.
-$router = new \Core\Router();
+$router = new \Core\Router\Router();
 
 // Rules
-$router->addRoute('/', function() {
-    echo 'hello world';
-});
+$router->addRoute('/', 'App\Controllers\MainController@index');
 $router->addRoute('/promo/(\w+)', 'App\Controllers\PromoController@show');
 $router->set404(function(){
     echo 'The requested page not found.';
 });
 
-
-$router->run();
+$app = new \Core\Application($router, $config);
+$app->bootstrap();
