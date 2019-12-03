@@ -45,9 +45,9 @@ class Application
     {
         // Load configuration from config file.
         $config = new Configuration(
-            $self->config['dsn'] ?? 'mysql:host=127.0.0.1;dbname=test_task_db;charset=utf8',
+            $self->config['dsn'] ?? 'mysql:host=127.0.0.1;dbname=test_task;charset=utf8',
             $self->config['user'] ?? 'root',
-            $self->config['password'] ?? '',
+            $self->config['password'] ?? 'root',
             $self->config['options'] ?? []
         );
 
