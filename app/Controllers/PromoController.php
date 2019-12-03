@@ -2,7 +2,9 @@
 
 namespace App\Controllers;
 
-class PromoController
+use Core\Controller;
+
+class PromoController extends Controller
 {
     public function show($slug)
     {

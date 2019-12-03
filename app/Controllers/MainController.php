@@ -4,22 +4,25 @@ namespace App\Controllers;
 
 use App\Helpers\Slugger;
 use App\Models\Promo;
+use Core\Controller;
 
 /**
  * Class MainController
  * @package App\Controllers
  */
-class MainController
+class MainController extends Controller
 {
     public function index()
     {
         $model = new Promo();
 
+        $data = [];
+
         $builder = $model->getBuilder();
         $tableExists = $builder->tableExists('promo');
 
         if ($tableExists) {
-            echo 'Table exists' . '<br>';
+            $data['tableExists'] = true;
         } else {
             $model->createTable();
         }
@@ -27,14 +30,15 @@ class MainController
         $model->getBuilder()->truncate($model->getTable());
         $model->exportDataFromCsv();
 
-        echo '<pre>';
-        print_r($model->getRandomModel());
+        $data['randomPromo'] = $model->getRandomModel();
 
         $models = $model->getBuilder()->select($model->getTable(), $model->getAttributes())->get();
         foreach ($models as $model) {
-            echo '<br>';
-            echo Slugger::generate($model['id'], $model['name']);
+            $data['promotions'][] = $model;
+//            $data['promotions'][] = 'http://localhost/promo/' . Slugger::generate($model['id'], $model['name']);
         }
+
+        $this->render($data);
 
     }
 }
