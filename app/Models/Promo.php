@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Adapters\CsvToArray;
+use App\Helpers\Slugger;
 
 /**
  * Class Promo
@@ -24,6 +25,7 @@ class Promo extends \Core\Model
             'start_date',
             'end_date',
             'status',
+            'slug',
         ];
     }
 
@@ -43,6 +45,7 @@ class Promo extends \Core\Model
                 'start_date' => strtotime($row['Дата начала акции']),
                 'end_date' => date('Y-m-d', strtotime($row['Дата начала акции'])),
                 'status' => $row['Статус'] == 'Off' ? 0 : 1,
+                'slug' => Slugger::generate($row['ID акции'], $row['Название акции']),
             ];
 
             $this->getBuilder()->insert($values);
@@ -84,6 +87,7 @@ class Promo extends \Core\Model
                 `start_date` INTEGER,
                 `end_date` DATETIME,
                 `status` BOOLEAN,
+                `slug` varchar(255),
                 PRIMARY KEY (`id`))
                 CHARACTER SET utf8 COLLATE utf8_general_ci";
 

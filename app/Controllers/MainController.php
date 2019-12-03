@@ -35,7 +35,6 @@ class MainController extends Controller
         $models = $model->getBuilder()->select($model->getTable(), $model->getAttributes())->get();
         foreach ($models as $model) {
             $data['promotions'][] = $model;
-//            $data['promotions'][] = 'http://localhost/promo/' . Slugger::generate($model['id'], $model['name']);
         }
 
         $this->render($data);
