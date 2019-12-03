@@ -73,9 +73,9 @@ class QueryBuilder implements Builder
         $query = $this->query;
         $sql = $query->base;
         if (!empty($query->where)) {
-            $sql .= 'WHERE ' . $query->where;
+            $sql .= " WHERE " . implode(' AND ', $query->where);
         }
-        return $this->connection->getPdo()->query($sql);
+        return $this->connection->getPdo()->query($sql)->fetchAll();
     }
 
     /**
