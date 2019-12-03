@@ -2,6 +2,10 @@
 
 namespace Core\Db\Builder;
 
+/**
+ * Interface Builder
+ * @package Core\Db\Builder
+ */
 interface Builder
 {
     public function select(string $table, array $fields): Builder;

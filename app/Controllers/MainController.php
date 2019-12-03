@@ -3,9 +3,12 @@
 namespace App\Controllers;
 
 use App\Helpers\Slugger;
-use App\Jobs\InitPromoJob;
 use App\Models\Promo;
 
+/**
+ * Class MainController
+ * @package App\Controllers
+ */
 class MainController
 {
     public function index()

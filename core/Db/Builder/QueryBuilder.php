@@ -6,10 +6,23 @@ use Core\Application;
 
 class QueryBuilder implements Builder
 {
+    /**
+     * @var $query string
+     */
     protected $query;
+    /**
+     * @var $connection \Core\Db\Connection
+     */
     protected $connection;
+    /**
+     * @var string
+     */
     protected $table;
 
+    /**
+     * QueryBuilder constructor.
+     * @param string $table
+     */
     public function __construct(string $table = '')
     {
         $this->table = $table;
@@ -21,6 +34,11 @@ class QueryBuilder implements Builder
         $this->query = new \stdClass;
     }
 
+    /**
+     * @param string $table
+     * @param array $fields
+     * @return Builder
+     */
     public function select(string $table, array $fields): Builder
     {
         $this->reset();
@@ -30,6 +48,13 @@ class QueryBuilder implements Builder
         return $this;
     }
 
+    /**
+     * @param string $field
+     * @param string $operator
+     * @param string $value
+     * @return Builder
+     * @throws \Exception
+     */
     public function where(string $field, string $operator = '=', string $value): Builder
     {
         if (!in_array($this->query->type, ['select', 'update'])) {
@@ -40,6 +65,9 @@ class QueryBuilder implements Builder
         return $this;
     }
 
+    /**
+     * @return false|\PDOStatement
+     */
     public function get()
     {
         $query = $this->query;
@@ -50,6 +78,10 @@ class QueryBuilder implements Builder
         return $this->connection->getPdo()->query($sql);
     }
 
+    /**
+     * @param $field
+     * @return array
+     */
     public function getColumns($field)
     {
         $query = $this->query;
@@ -60,12 +92,18 @@ class QueryBuilder implements Builder
         return $this->connection->getPdo()->query($sql)->fetchAll(\PDO::FETCH_COLUMN, $field);
     }
 
+    /**
+     * @param $values
+     */
     public function update($values)
     {
         $sql = "UPDATE `promo` WHERE {$this->query->where} SET VALUES $values";
         $this->connection->getPdo()->prepare($sql)->execute($values);
     }
 
+    /**
+     * @param $values
+     */
     public function insert($values)
     {
         $sql = sprintf(
@@ -81,6 +119,10 @@ class QueryBuilder implements Builder
         $this->connection->getPdo()->lastInsertId();
     }
 
+    /**
+     * @param $table
+     * @return bool
+     */
     public function tableExists($table): bool
     {
         $t = $this->table ?: $table;
@@ -94,16 +136,27 @@ class QueryBuilder implements Builder
         return $result !== false;
     }
 
+    /**
+     * @param $sql
+     * @return false|\PDOStatement
+     */
     public function raw($sql)
     {
         return $this->connection->getPdo()->query($sql);
     }
 
+    /**
+     * @param $table
+     */
     public function truncate($table)
     {
         $this->connection->getPdo()->query("truncate $table");
     }
 
+    /**
+     * @param string $table
+     * @return static
+     */
     public static function query($table = '')
     {
         return new static($table);

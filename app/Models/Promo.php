@@ -4,12 +4,19 @@ namespace App\Models;
 
 use App\Adapters\CsvToArray;
 
+/**
+ * Class Promo
+ * @package App\Models
+ */
 class Promo extends \Core\Model
 {
     protected $table = 'promo';
     protected $csv = __DIR__.'/../../data.csv';
 
-    public function getAttributes()
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
     {
         return [
             'id',
@@ -19,7 +26,11 @@ class Promo extends \Core\Model
             'status',
         ];
     }
-    public function exportDataFromCsv()
+
+    /**
+     * Insert data to database from csv
+     */
+    public function exportDataFromCsv(): void
     {
         if(!file_exists($this->csv)) {
             die('File not found.');
@@ -34,10 +45,13 @@ class Promo extends \Core\Model
                 'status' => $row['Статус'] == 'Off' ? 0 : 1,
             ];
 
-            echo (int)$this->getBuilder()->insert($values);
+            $this->getBuilder()->insert($values);
         }
     }
 
+    /**
+     * @return array
+     */
     public function getRandomModel(): array
     {
         $builder = $this->getBuilder();

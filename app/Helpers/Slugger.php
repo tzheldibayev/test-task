@@ -2,6 +2,10 @@
 
 namespace App\Helpers;
 
+/**
+ * Class Slugger
+ * @package App\Helpers
+ */
 class Slugger
 {
     private const HOSTNAME = '';
@@ -48,6 +52,11 @@ class Slugger
         "ґ" => "g"
     ];
 
+    /**
+     * @param $id
+     * @param $name
+     * @return string
+     */
     public static function generate($id, $name)
     {
         $convertedAlpha = self::convertAlpha(mb_strtolower($name));
@@ -57,21 +66,37 @@ class Slugger
         return sprintf('%s%d-%s', self::HOSTNAME, $id, $trimmedDashes);
     }
 
+    /**
+     * @param $text
+     * @return string
+     */
     private static function convertAlpha($text)
     {
         return strtr($text, self::ALPHA_MAP);
     }
 
+    /**
+     * @param $text
+     * @return string|string[]|null
+     */
     private static function convertSymbols($text)
     {
         return preg_replace('/[^A-Za-z0-9]/', '-', $text);
     }
 
+    /**
+     * @param $text
+     * @return string|string[]|null
+     */
     private static function removeDuplicateDashes($text)
     {
         return preg_replace('/-+/', '-', $text);
     }
 
+    /**
+     * @param $text
+     * @return string
+     */
     private static function trimDashes($text)
     {
         return trim($text, '-');
