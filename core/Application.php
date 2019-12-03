@@ -32,7 +32,7 @@ class Application
     {
         // Load configuration from config file.
         $this->dbConfiguration = new Configuration(
-            $this->config['dsn'] ?? 'mysql:host=127.0.0.1;dbname=test_task_db;charset=utf8',
+            $this->config['dsn'] ?? 'mysql:host=127.0.0.1;dbname=test_task;charset=utf8',
             $this->config['user'] ?? 'root',
             $this->config['password'] ?? 'root',
             $this->config['options'] ?? []
@@ -41,7 +41,7 @@ class Application
         $this->router->run();
     }
 
-    public static function getDb()
+    public static function getDbConnection()
     {
         // Load configuration from config file.
         $config = new Configuration(

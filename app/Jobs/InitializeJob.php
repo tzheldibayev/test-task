@@ -4,6 +4,8 @@ namespace App\Jobs;
 
 use App\Adapters\CsvToArray;
 use Core\Application;
+use Core\Db\Builder\Builder;
+use Core\Db\Builder\QueryBuilder;
 
 class InitializeJob implements Job
 {
@@ -15,23 +17,28 @@ class InitializeJob implements Job
 
     public function handle()
     {
-        $this->pdo = Application::getDb()->getPdo();
+        $this->pdo = Application::getDbConnection()->getPdo();
 
-        if ($this->tableExists()) {
+        $builder = QueryBuilder::query();
+        $tableExists = $builder->tableExists('promo');
+        if ($builder->tableExists('promo')) {
             $this->result['tableExists'] = true;
         } else {
-            $this->pdo->query('CREATE TABLE `promo` (
+            $sql = 'CREATE TABLE `promo` (
                 `id` INT AUTO_INCREMENT NOT NULL,
                 `name` varchar(255) NOT NULL,
                 `start_date` INTEGER,
                 `end_date` DATETIME,
                 `status` BOOLEAN,
-                PRIMARY KEY (`id`)) 
-                CHARACTER SET utf8 COLLATE utf8_general_ci'
-            );
+                PRIMARY KEY (`id`))
+                CHARACTER SET utf8 COLLATE utf8_general_ci';
+
+            $builder->raw($sql);
 
             $this->result['tableExists'] = false;
         }
+
+        $builder->truncate('promo');
 
         $this->exportData();
         $selectedId = $this->changeStatusForRandomRow();
@@ -39,17 +46,6 @@ class InitializeJob implements Job
 
         return $this->result;
 
-    }
-
-    public function tableExists()
-    {
-        try {
-            $result = $this->pdo->query('SELECT 1 FROM promo LIMIT 1');
-        } catch (\Exception $e) {
-            return false;
-        }
-
-        return $result !== false;
     }
 
     private function exportData()

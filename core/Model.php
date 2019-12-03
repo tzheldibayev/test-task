@@ -9,13 +9,8 @@ abstract class Model
 {
     protected $table;
 
-    public function getTable()
+    public function getBuilder(): Builder
     {
-        return $this->table;
-    }
-
-    protected function getBuilder(): Builder
-    {
-        return new QueryBuilder();
+        return new QueryBuilder($this->table);
     }
 }

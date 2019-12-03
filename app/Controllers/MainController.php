@@ -4,11 +4,14 @@ namespace App\Controllers;
 
 use App\Helpers\Slugger;
 use App\Jobs\InitializeJob;
+use App\Models\Promo;
 
 class MainController
 {
     public function index()
     {
+//        $model = new Promo();
+
         $job = new InitializeJob();
         $result = $job->handle();
 

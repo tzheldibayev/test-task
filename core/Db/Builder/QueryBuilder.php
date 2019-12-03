@@ -2,6 +2,7 @@
 
 namespace Core\Db\Builder;
 
+use Core\Application;
 use Core\Db\Connection;
 
 class QueryBuilder implements Builder
@@ -9,9 +10,9 @@ class QueryBuilder implements Builder
     protected $query;
     protected $connection;
 
-    public function __construct(Connection $connection)
+    public function __construct()
     {
-        $this->connection = $connection;
+        $this->connection = Application::getDbConnection();
     }
 
     protected function reset(): void
@@ -46,5 +47,31 @@ class QueryBuilder implements Builder
             $sql .= 'WHERE ' . $query->where;
         }
         return $this->connection->getPdo()->query($sql);
+    }
+
+    public function tableExists($table): bool
+    {
+        try {
+            $result = $this->connection->getPdo()->query("SELECT 1 FROM {$table} LIMIT 1");
+        } catch (\Exception $ex) {
+            return false;
+        }
+
+        return $result !== false;
+    }
+
+    public function raw($sql)
+    {
+        $this->connection->getPdo()->query($sql);
+    }
+
+    public function truncate($table)
+    {
+        $this->connection->getPdo()->query("truncate $table");
+    }
+
+    public static function query()
+    {
+        return new static();
     }
 }
