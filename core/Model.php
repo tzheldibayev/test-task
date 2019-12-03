@@ -13,4 +13,9 @@ abstract class Model
     {
         return new QueryBuilder($this->table);
     }
+
+    public function getTable()
+    {
+        return $this->table;
+    }
 }

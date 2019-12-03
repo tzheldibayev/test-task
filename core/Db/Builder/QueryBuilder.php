@@ -3,15 +3,16 @@
 namespace Core\Db\Builder;
 
 use Core\Application;
-use Core\Db\Connection;
 
 class QueryBuilder implements Builder
 {
     protected $query;
     protected $connection;
+    protected $table;
 
-    public function __construct()
+    public function __construct(string $table = '')
     {
+        $this->table = $table;
         $this->connection = Application::getDbConnection();
     }
 
@@ -39,7 +40,7 @@ class QueryBuilder implements Builder
         return $this;
     }
 
-    public function get(): string
+    public function get()
     {
         $query = $this->query;
         $sql = $query->base;
@@ -49,10 +50,43 @@ class QueryBuilder implements Builder
         return $this->connection->getPdo()->query($sql);
     }
 
+    public function getColumns($field)
+    {
+        $query = $this->query;
+        $sql = $query->base;
+        if (!empty($query->where)) {
+            $sql .= 'WHERE ' . $query->where;
+        }
+        return $this->connection->getPdo()->query($sql)->fetchAll(\PDO::FETCH_COLUMN, $field);
+    }
+
+    public function update($values)
+    {
+        $sql = "UPDATE `promo` WHERE {$this->query->where} SET VALUES $values";
+        $this->connection->getPdo()->prepare($sql)->execute($values);
+    }
+
+    public function insert($values)
+    {
+        $sql = sprintf(
+            'INSERT INTO %s (%s) VALUES (%s)',
+            $this->table,
+            implode(', ', array_keys($values)),
+            ':' . implode(', :', array_keys($values))
+        );
+        $this->connection
+            ->getPdo()
+            ->prepare($sql)
+            ->execute($values);
+        $this->connection->getPdo()->lastInsertId();
+    }
+
     public function tableExists($table): bool
     {
+        $t = $this->table ?: $table;
+
         try {
-            $result = $this->connection->getPdo()->query("SELECT 1 FROM {$table} LIMIT 1");
+            $result = $this->connection->getPdo()->query("SELECT 1 FROM {$t} LIMIT 1");
         } catch (\Exception $ex) {
             return false;
         }
@@ -62,7 +96,7 @@ class QueryBuilder implements Builder
 
     public function raw($sql)
     {
-        $this->connection->getPdo()->query($sql);
+        return $this->connection->getPdo()->query($sql);
     }
 
     public function truncate($table)
@@ -70,8 +104,8 @@ class QueryBuilder implements Builder
         $this->connection->getPdo()->query("truncate $table");
     }
 
-    public static function query()
+    public static function query($table = '')
     {
-        return new static();
+        return new static($table);
     }
 }

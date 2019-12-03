@@ -3,28 +3,34 @@
 namespace App\Controllers;
 
 use App\Helpers\Slugger;
-use App\Jobs\InitializeJob;
+use App\Jobs\InitPromoJob;
 use App\Models\Promo;
 
 class MainController
 {
     public function index()
     {
-//        $model = new Promo();
+        $model = new Promo();
 
-        $job = new InitializeJob();
-        $result = $job->handle();
+        $builder = $model->getBuilder();
+        $tableExists = $builder->tableExists('promo');
 
-        if ($result['tableExists'] === true) {
+        if ($tableExists) {
             echo 'Table exists' . '<br>';
+        } else {
+            $model->createTable();
         }
 
-        echo '<pre>';
-        print_r($result['randomRow']);
+        $model->getBuilder()->truncate($model->getTable());
+        $model->exportDataFromCsv();
 
-        foreach ($result['promo'] as $promo) {
+        echo '<pre>';
+        print_r($model->getRandomModel());
+
+        $models = $model->getBuilder()->select($model->getTable(), $model->getAttributes())->get();
+        foreach ($models as $model) {
             echo '<br>';
-            echo Slugger::generate($promo['id'],$promo['name']);
+            echo Slugger::generate($model['id'], $model['name']);
         }
 
     }
