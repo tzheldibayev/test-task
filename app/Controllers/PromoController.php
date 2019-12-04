@@ -10,6 +10,9 @@ class PromoController extends Controller
     protected $viewPath = 'promo';
     protected $viewFile = 'show';
 
+    /**
+     * @param $slug
+     */
     public function show($slug)
     {
         $model = new Promo();

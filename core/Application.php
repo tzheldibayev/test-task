@@ -13,42 +13,40 @@ class Application
      */
     private $router;
     /**
-     * @var Configuration
-     */
-    private $dbConfiguration;
-    /**
      * @var array
      */
     private $config = [];
 
-
+    /**
+     * Application constructor.
+     * @param  RouterInterface  $router
+     * @param $config
+     */
     public function __construct(RouterInterface $router, $config)
     {
         $this->router = $router;
         $this->config = $config;
     }
 
-    public function bootstrap()
+    /**
+     * Application bootstrap.
+     */
+    public function bootstrap(): void
     {
-        // Load configuration from config file.
-        $this->dbConfiguration = new Configuration(
-            $this->config['dsn'] ?? 'mysql:host=127.0.0.1;dbname=test_task;charset=utf8',
-            $this->config['user'] ?? 'root',
-            $this->config['password'] ?? 'root',
-            $this->config['options'] ?? []
-        );
-
         $this->router->run();
     }
 
-    public static function getDbConnection()
+    /**
+     * @return Connection
+     */
+    public static function getDbConnection(): Connection
     {
         // Load configuration from config file.
         $config = new Configuration(
-            $self->config['dsn'] ?? 'mysql:host=127.0.0.1;dbname=test_task;charset=utf8',
-            $self->config['user'] ?? 'root',
-            $self->config['password'] ?? 'root',
-            $self->config['options'] ?? []
+            $self->config['db']['dsn'] ?? 'mysql:host=127.0.0.1;dbname=test_task_db;charset=utf8',
+            $self->config['db']['user'] ?? 'root',
+            $self->config['db']['password'] ?? '',
+            $self->config['db']['options'] ?? []
         );
 
         return new Connection($config);

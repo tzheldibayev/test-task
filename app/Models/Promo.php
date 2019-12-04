@@ -79,6 +79,9 @@ class Promo extends \Core\Model
         return $data;
     }
 
+    /**
+     * Create new table.
+     */
     public function createTable()
     {
         $sql = "CREATE TABLE `{$this->getTable()}` (

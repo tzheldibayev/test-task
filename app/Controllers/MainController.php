@@ -2,7 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Helpers\Slugger;
 use App\Models\Promo;
 use Core\Controller;
 
