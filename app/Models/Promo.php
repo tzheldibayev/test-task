@@ -43,7 +43,7 @@ class Promo extends \Core\Model
                 'id' => (int) $row['ID акции'],
                 'name' => $row['Название акции'],
                 'start_date' => strtotime($row['Дата начала акции']),
-                'end_date' => date('Y-m-d', strtotime($row['Дата начала акции'])),
+                'end_date' => date('Y-m-d', strtotime($row['Дата окончания'])),
                 'status' => $row['Статус'] == 'Off' ? 0 : 1,
                 'slug' => Slugger::generate($row['ID акции'], $row['Название акции']),
             ];
